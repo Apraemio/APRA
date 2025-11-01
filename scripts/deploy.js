@@ -1,5 +1,7 @@
 const ApraModule = require("../ignition/modules/Apra");
 const TimeLockModule = require("../ignition/modules/TimeLock");
+const PRPLockModule = require("../ignition/modules/PRPLock");
+
 require('dotenv').config()
 
 async function main() {
@@ -22,6 +24,15 @@ async function main() {
     ); 
 
     console.log(`TimeLock deployed to: ${await timelock.getAddress()}`);
+
+    const { prplock }= await hre.ignition.deploy(PRPLockModule, {
+        defaultSender: process.env.DEPLOYER_ADDRESS,
+        parameters: {prplock:{apra:await apra.getAddress()}}},
+    ); 
+
+    console.log(`PRPLock deployed to: ${await prplock.getAddress()}`);
+
+    
 }
   
 main().catch(console.error);

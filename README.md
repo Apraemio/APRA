@@ -11,6 +11,8 @@ $APRA is coded in Solidity and is a BEP20 (ERC20) based token. The OpenZeppelin 
 
 The TimeLock contract implements the vesting logic described in the whitepaper: 60% of token purchases are locked in the vesting contract until the start of the ICO (CEX listing). After that 10% of the original purchase can be withdrawn at the end of every month (30 days) thus releasing the whole amount during a 6 months cooldown period. In case a wallet associated with a lock would be compromised it is possible to transfer the lock to another wallet.
 
+The PRPLock contract implements the Priority Redemption Program locking. It locks funds for a year. One user can have several locks. In case a wallet associated with a lock would be compromised it is possible to transfer the lock to another wallet. A lock can be broken before expiration with admin confirmation.
+
 # Functional Requirements
 
 ## Features
@@ -51,6 +53,15 @@ The TimeLock contract (TimeLock_v2.sol) implements token vesting.
 - It is not possible to lock tokens after the *icoTimestamp*
 - Only locker accounts can lock tokens. It can be queried (*canLock*) if an address can lock. The owner can add (*setAccountAsLocker*) and remove (*removeAccountFromLockers*) addressess from the list that can lock tokens.
 
+The PRPLock contract (PRPLock.sol) implements PRP locking.
+
+- Upon entering the PRP users lock their tokens for a one year period. A lock is represented by a *Locker* structure that contains the token amount and expiration date. Tokens locked for the same address will create a new lock.
+- Locking happens via Locker accounts
+- Tokens can be withdrawn (*withdraw*) after the expiration date.
+- A lock can be broken before expiration in two steps: 1. (*break*) 2. (*confirm*)
+- It is possible to query the locks for a user. *available* has two versions that can be used for the sender or a given address at the current time
+- If an account is compromised it can transfer it's lock to another address (*transfer*)
+
 ## Roles
 
 The $APRA contract has the following roles:
@@ -58,11 +69,17 @@ The $APRA contract has the following roles:
 - User (default): can transfer tokens, or give allowance to another address to do so
 - Admin (owner): can enable or disable the fee feature globally and mark addresses to be exempt from fee payment. Can as well trasfer the admin role to another address or denounce it.
 
-The TimeLock contract has two roles as well:
+The TimeLock contract has three roles:
 
 - User (default): can create, withdraw or transfer a lock.
 - Admin (owner): can set the ICO timestamp and lock the ICO timestamp.
 - Locker: A list of locker accounts is maintained who can lock amounts for users. 
+
+The PRPLock contract has three roles as well:
+
+- User (default): can create, withdraw or transfer a lock.
+- Admin (owner): can confirm breaking locks. Can as well trasfer the admin role to another address.
+- Locker: A list of locker accounts is maintained who can lock amounts for users.
 
 # Technical Requirements
 
