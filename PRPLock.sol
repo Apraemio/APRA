@@ -38,7 +38,7 @@ contract PRPLock is Ownable2Step {
     /**
     * @param _apra Address of APRA token contract
     */
-    constructor(APRA _apra) Ownable(_msgSender()){
+    constructor(APRA _apra) Ownable_(_msgSender()){
         apra = _apra;
     }
 
